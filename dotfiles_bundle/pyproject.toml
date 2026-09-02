@@ -1,0 +1,203 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "forgeai-agents"
+version = "0.1.0"
+description = "A production-ready implementation combining GitHub and Jira operations through MCP (Model Context Protocol) with an intelligent FastAPI client"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Proprietary"}
+authors = [
+    {name = "Modak Analytics", email = "sales@modak.com"},
+]
+keywords = ["mcp", "github", "jira", "fastapi", "ai"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: Other/Proprietary License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    # MCP Server dependencies
+    # mcp 2.0.0 removes `mcp.server.fastmcp` and `mcp.shared.context.RequestContext`.
+    "mcp>=1.9.2,<2.0.0",
+    "langchain>=1.3.0,<1.4.0",
+    "langgraph>=1.2.0,<1.3.0",
+    "langchain-anthropic>=1.0.0",
+    # ChatOpenAI drops reasoning_content for third-party base_urls.
+    "langchain-deepseek>=1.1.0",
+    "langchain-openai>=1.2.0",
+    "langchain-mcp-adapters>=0.2.1",
+    "httpx>=0.27.0",
+    "pydantic>=2.0.0",
+    # FastAPI Client dependencies
+    "fastapi>=0.115.12",
+    "uvicorn>=0.30.0",
+    "redis>=6.1.0",
+    "pydantic-settings>=2.0.0",
+    # AI service integrations
+    "anthropic>=0.52.0",
+    "openai>=1.99.1",
+    # Development dependencies
+    "python-dotenv>=1.0.0",
+    # Optional dependencies for better error handling
+    "typing-extensions>=4.8.0",
+    "portkey-ai>=2.1.0",
+    "langfuse>=3.0.0",
+    "databricks-sdk>=0.78.0",
+    "aiohttp>=3.13.4",
+    "tiktoken>=0.12.0",
+    # github_get_content text extraction (server/utils/document_extraction.py).
+    # pypdf over PyMuPDF (AGPL) and pdfplumber (heavier, more transitive deps).
+    # openpyxl was already present transitively via databricks-sql-connector;
+    # it is declared here so a driver bump cannot silently drop it.
+    # python-pptx pulls in Pillow and lxml; python-docx pulls in lxml.
+    "pypdf>=5.0.0",
+    "openpyxl>=3.1.0",
+    "python-docx>=1.1.0",
+    "python-pptx>=1.0.0",
+    # Data-exploration stage: SQL safety gate + per-source drivers
+    "sqlglot>=25.0.0",
+    "psycopg[binary]>=3.2.0",
+    "pymysql>=1.1.0",
+    "oracledb>=2.4.0",
+    "databricks-sql-connector>=3.4.0",
+    "snowflake-connector-python>=3.10.0",
+    "neo4j>=5.20.0",
+    "simple-salesforce>=1.12.0",
+    "boto3>=1.34.0",
+    "jaydebeapi>=1.2.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    # Single source of truth. This was previously declared twice with
+    # conflicting floors: >=1.3.0 as a RUNTIME dependency and >=0.23.0 here.
+    # It is a test-only package, so it belongs in dev only, and the tests rely
+    # on asyncio_mode="auto" which needs the 1.x line.
+    "pytest-asyncio>=1.3.0",
+    "pytest-mock>=3.12.0",
+    # Configured in [tool.ruff.lint] below but never actually installed, so
+    # `ruff check` could not run at all.
+    "ruff>=0.14.0",
+]
+impala = [
+    "impyla>=0.18",
+    "thrift_sasl>=0.4",
+]
+sqlserver = [
+    "pymssql>=2.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/forgeai-agents"
+Documentation = "https://github.com/yourusername/forgeai-agents#readme"
+Repository = "https://github.com/yourusername/forgeai-agents.git"
+Issues = "https://github.com/yourusername/forgeai-agents/issues"
+
+[project.scripts]
+forgeai-agents = "server.main:main"
+forgeai-mcp-client = "client.app:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+asyncio_mode = "auto"
+# Unregistered marks are only a warning, so a typo'd or unavailable mark silently
+# does nothing. @pytest.mark.timeout in particular needs pytest-timeout, which is
+# not a dependency here -- registering it makes that explicit rather than letting
+# a test look time-limited when it is not.
+markers = [
+    "live_llm: calls a real LLM provider. Costs money, needs the network, and is opt-in via E2E_LIVE_LLM=1.",
+    "timeout: requires pytest-timeout; a no-op without it.",
+]
+
+[tool.coverage.run]
+source = ["server", "client"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+# Modern ruff reads these under [tool.ruff.lint]; the old top-level `select`
+# / `ignore` / `per-file-ignores` keys are deprecated and emit a warning.
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501", # line too long, handled by the formatter
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex
+    # Pre-existing style debt from a codebase that had never been linted (ruff
+    # was configured here but never installed). These are silenced so
+    # `ruff check` is a usable gate today and CI can enforce "no new findings";
+    # every rule that indicates an actual fault stays enabled. F811 (duplicate
+    # ChatRenameRequest dropping max_length validation) and F841 were fixed
+    # rather than ignored.
+    "B904", # raise ... from err -- traceback quality, not correctness
+    "E402", # module import not at top (several files set sys.path first)
+    "B905", # zip() without explicit strict=
+    "E722", # bare except (1 site, server/clients/jira_client.py)
+    "E741", # ambiguous variable name
+    "W291", # trailing whitespace
+    "W293", # blank line contains whitespace
+    "C408", # dict() call instead of literal
+    "C416", # unnecessary comprehension
+    "F841", # assigned-but-unused local (kept for readability at several sites;
+            # each was reviewed -- none masks a bug)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+# _executor_core re-exports the shared limits/constants that query_execution,
+# cypher_execution and soql_execution all import from it. They read as unused
+# here, but stripping them (as `ruff --fix` did once) breaks every importer.
+"server/utils/_executor_core.py" = ["F401"]
+# Tests deliberately import-probe for optional deps inside try/except (F401)
+# and bind context managers they do not reference (F841).
+"tests/*" = ["F401", "F841"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["server", "client"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["server", "client"]
