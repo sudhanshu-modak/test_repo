@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650">
+<defs>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L9,3 z" fill="#555"/>
+  </marker>
+  <style>
+    .box{fill:#fff;stroke:#333;stroke-width:2;rx:14}
+    .title{font:700 25px Arial;fill:#222}
+    .label{font:600 18px Arial;fill:#222}
+    .small{font:15px Arial;fill:#555}
+    .flow{stroke:#555;stroke-width:3;fill:none;marker-end:url(#arrow)}
+  </style>
+</defs>
+<rect width="1200" height="650" fill="#f7f8fa"/>
+<text x="600" y="48" text-anchor="middle" class="title">Data Engineering Pipeline</text>
+<text x="600" y="76" text-anchor="middle" class="small">Ingest → Transform → Store → Serve</text>
+
+<rect x="50" y="130" width="190" height="125" class="box"/>
+<text x="145" y="170" text-anchor="middle" class="label">Data Sources</text>
+<text x="145" y="202" text-anchor="middle" class="small">APIs • DBs • Files</text>
+<text x="145" y="225" text-anchor="middle" class="small">Streams • SaaS</text>
+
+<rect x="310" y="130" width="190" height="125" class="box"/>
+<text x="405" y="170" text-anchor="middle" class="label">Ingestion</text>
+<text x="405" y="202" text-anchor="middle" class="small">Batch • Streaming</text>
+<text x="405" y="225" text-anchor="middle" class="small">CDC / Kafka</text>
+
+<rect x="570" y="130" width="190" height="125" class="box"/>
+<text x="665" y="170" text-anchor="middle" class="label">Processing</text>
+<text x="665" y="202" text-anchor="middle" class="small">Spark / SQL</text>
+<text x="665" y="225" text-anchor="middle" class="small">Clean • Join • Aggregate</text>
+
+<rect x="830" y="130" width="190" height="125" class="box"/>
+<text x="925" y="170" text-anchor="middle" class="label">Storage</text>
+<text x="925" y="202" text-anchor="middle" class="small">Data Lake / Warehouse</text>
+<text x="925" y="225" text-anchor="middle" class="small">Bronze → Silver → Gold</text>
+
+<path d="M240 192 H305" class="flow"/>
+<path d="M500 192 H565" class="flow"/>
+<path d="M760 192 H825" class="flow"/>
+
+<rect x="310" y="350" width="190" height="125" class="box"/>
+<text x="405" y="390" text-anchor="middle" class="label">Orchestration</text>
+<text x="405" y="422" text-anchor="middle" class="small">Airflow / ADF</text>
+<text x="405" y="445" text-anchor="middle" class="small">Schedule • Retry • Monitor</text>
+
+<rect x="570" y="350" width="190" height="125" class="box"/>
+<text x="665" y="390" text-anchor="middle" class="label">Data Quality</text>
+<text x="665" y="422" text-anchor="middle" class="small">Checks • Validation</text>
+<text x="665" y="445" text-anchor="middle" class="small">Freshness • Completeness</text>
+
+<rect x="830" y="350" width="190" height="125" class="box"/>
+<text x="925" y="390" text-anchor="middle" class="label">Analytics</text>
+<text x="925" y="422" text-anchor="middle" class="small">BI • ML • APIs</text>
+<text x="925" y="445" text-anchor="middle" class="small">Business Insights</text>
+
+<path d="M405 255 V345" class="flow"/>
+<path d="M665 255 V345" class="flow"/>
+<path d="M925 255 V345" class="flow"/>
+<path d="M500 412 H565" class="flow"/>
+<path d="M760 412 H825" class="flow"/>
+
+<rect x="50" y="535" width="970" height="60" rx="12" fill="#e9ecef"/>
+<text x="535" y="572" text-anchor="middle" class="label">Key concepts: ETL/ELT • Batch vs Streaming • CDC • Partitioning • Schema Evolution • Lineage</text>
+</svg>
